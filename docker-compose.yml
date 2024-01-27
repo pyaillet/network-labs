@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  diagrams:
+    image: python:3.11
+    volumes:
+      - ./:/app
+    working_dir: /app
+    command:
+      - bash
+      - -c
+      - "apt update && apt install -y graphviz xdg-utils && pip3 install diagrams && python3 ./vxlan.py"
+    

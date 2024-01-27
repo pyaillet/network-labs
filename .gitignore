@@ -1,0 +1,5 @@
+bgp-evpn/
+clab-vxlan-static-vtep/
+clab-vxlan-multicast/
+
+*.bak
