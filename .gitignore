@@ -1,5 +1,6 @@
 bgp-evpn/
 clab-vxlan-static-vtep/
 clab-vxlan-multicast/
+clab-ipv6-static-routes/
 
 *.bak

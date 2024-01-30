@@ -2,67 +2,41 @@ default:
 	@echo "Choose a lab:"
 	@echo " - vxlan-multicast"
 	@echo " - vxlan-static-vtep"
+	@echo " - ipv6-static-routes"
 
 .PHONY: vxlan-multicast
-vxlan-multicast: deploy-multicast validate-multicast
+vxlan-multicast: deploy-vxlan-multicast validate-vxlan-multicast
 
 .PHONY: vxlan-static-vtep
-vxlan-static-vtep: deploy-static-vtep validate-static-vtep
+vxlan-static-vtep: deploy-vxlan-static-vtep validate-vxlan-static-vtep
 
-deploy-multicast:
+.PHONY: ipv6-static-routes
+ipv6-static-routes: deploy-ipv6-static-routes validate-ipv6-static-routes
+
+deploy-vxlan-multicast:
 	sudo containerlab deploy --topo ./vxlan-multicast/topology.yaml
 
-deploy-static-vtep:
+deploy-vxlan-static-vtep:
 	sudo containerlab deploy --topo ./vxlan-static-vtep/topology.yaml
 
-validate-multicast:
-	@echo "Testing ping from pc1 to pc2 ✅"
-	docker container exec -it clab-vxlan-multicast-pc1 ping -c1 -W1 192.168.32.20
-	@echo "Testing ping from pc1 to pc3 ❌"
-	docker container exec -it clab-vxlan-multicast-pc1 ping -c1 -W1 192.168.32.30 || true
-	@echo "Testing ping from pc1 to pc4 ❌"
-	docker container exec -it clab-vxlan-multicast-pc1 ping -c1 -W1 192.168.32.40 || true
-	@echo "Testing ping from pc1 to pc5 ✅"
-	docker container exec -it clab-vxlan-multicast-pc1 ping -c1 -W1 192.168.32.50
-	@echo "Testing ping from pc1 to pc6 ❌"
-	docker container exec -it clab-vxlan-multicast-pc1 ping -c1 -W1 192.168.32.60 || true
-	@echo "Testing ping from pc1 to pc7 ✅"
-	docker container exec -it clab-vxlan-multicast-pc1 ping -c1 -W1 192.168.32.70
-	@echo "Testing ping from pc3 to pc1 ❌"
-	docker container exec -it clab-vxlan-multicast-pc3 ping -c1 -W1 192.168.32.10 || true
-	@echo "Testing ping from pc3 to pc2 ❌"
-	docker container exec -it clab-vxlan-multicast-pc3 ping -c1 -W1 192.168.32.20 || true
-	@echo "Testing ping from pc3 to pc4 ✅"
-	docker container exec -it clab-vxlan-multicast-pc3 ping -c1 -W1 192.168.32.40
-	@echo "Testing ping from pc3 to pc5 ❌"
-	docker container exec -it clab-vxlan-multicast-pc3 ping -c1 -W1 192.168.32.50 || true
-	@echo "Testing ping from pc3 to pc6 ✅"
-	docker container exec -it clab-vxlan-multicast-pc3 ping -c1 -W1 192.168.32.60
-	@echo "Testing ping from pc3 to pc7 ❌"
-	docker container exec -it clab-vxlan-multicast-pc3 ping -c1 -W1 192.168.32.70 || true
+deploy-ipv6-static-routes:
+	sudo containerlab deploy --topo ./ipv6-static-routes/topology.yaml
 
-validate-static-vtep:
-	@echo "Testing ping from pc1 to pc2 ✅"
-	docker container exec -it clab-vxlan-static-vtep-pc1 ping -c1 -W1 192.168.32.20
-	@echo "Testing ping from pc1 to pc3 ❌"
-	docker container exec -it clab-vxlan-static-vtep-pc1 ping -c1 -W1 192.168.32.30 || true
-	@echo "Testing ping from pc1 to pc4 ❌"
-	docker container exec -it clab-vxlan-static-vtep-pc1 ping -c1 -W1 192.168.32.40 || true
-	@echo "Testing ping from pc1 to pc5 ✅"
-	docker container exec -it clab-vxlan-static-vtep-pc1 ping -c1 -W1 192.168.32.50
-	@echo "Testing ping from pc1 to pc6 ❌"
-	docker container exec -it clab-vxlan-static-vtep-pc1 ping -c1 -W1 192.168.32.60 || true
-	@echo "Testing ping from pc3 to pc1 ❌"
-	docker container exec -it clab-vxlan-static-vtep-pc3 ping -c1 -W1 192.168.32.10 || true
-	@echo "Testing ping from pc3 to pc2 ❌"
-	docker container exec -it clab-vxlan-static-vtep-pc3 ping -c1 -W1 192.168.32.20 || true
-	@echo "Testing ping from pc3 to pc4 ✅"
-	docker container exec -it clab-vxlan-static-vtep-pc3 ping -c1 -W1 192.168.32.40
-	@echo "Testing ping from pc3 to pc5 ❌"
-	docker container exec -it clab-vxlan-static-vtep-pc3 ping -c1 -W1 192.168.32.50 || true
-	@echo "Testing ping from pc3 to pc6 ✅"
-	docker container exec -it clab-vxlan-static-vtep-pc3 ping -c1 -W1 192.168.32.60
+validate-vxlan-multicast:
+	./vxlan-multicast/validate.sh
+
+validate-vxlan-static-vtep:
+	./vxlan-static-vtep/validate.sh
+
+validate-ipv6-static-routes:
+	./ipv6-static-routes/validate.sh
 
 clean:
 	sudo containerlab destroy --topo vxlan-multicast/topology.yaml || true
 	sudo containerlab destroy --topo vxlan-static-vtep/topology.yaml || true
+	sudo containerlab destroy --topo ipv6-static-routes/topology.yaml || true
+
+mrproper:
+	sudo rm -Rf ./clab-vxlan-multicast
+	sudo rm -Rf ./clab-vxlan-static-vtep
+	sudo rm -Rf ./clab-ipv6-static-routes

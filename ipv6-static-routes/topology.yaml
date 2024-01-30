@@ -1,0 +1,128 @@
+name: ipv6-static-routes
+
+topology:
+  nodes:
+    r1:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - sysctl -w net.ipv6.conf.all.forwarding=1
+        - ip link add name br1 type bridge
+        - ip link set i1-1 master br1
+        - ip link set i1-2 master br1
+        - ip addr add 2001:db8:cafe:cafe:10::1/80 dev br1
+        - ip addr add 2001:db8:cafe:cafe:25::1/80 dev e1-2
+        - ip addr add 2001:db8:cafe:cafe:35::1/80 dev e1-3
+        - ip addr add 2001:db8:cafe:cafe:45::1/80 dev e1-4
+        - ip link set br1 up
+        - ip link set i1-1 up
+        - ip link set i1-2 up
+        - ip link set e1-2 up
+        - ip link set e1-3 up
+        - ip link set e1-4 up
+        - ip -6 route add 2001:db8:cafe:cafe:10::/80 dev br1
+        - ip -6 route add 2001:db8:cafe:cafe:20::/80 via 2001:db8:cafe:cafe:25::2 dev e1-2
+        - ip -6 route add 2001:db8:cafe:cafe:30::/80 via 2001:db8:cafe:cafe:35::2 dev e1-3
+        - ip -6 route add 2001:db8:cafe:cafe:40::/80 via 2001:db8:cafe:cafe:45::2 dev e1-4
+    r2:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - sysctl -w net.ipv6.conf.all.forwarding=1
+        - ip link add name br2 type bridge
+        - ip link set i2-3 master br2
+        - ip addr add 2001:db8:cafe:cafe:20::1/80 dev br2
+        - ip addr add 2001:db8:cafe:cafe:25::2/80 dev e2-1
+        - ip addr add 2001:db8:cafe:cafe:55::2/80 dev e2-4
+        - ip link set br2 up
+        - ip link set i2-3 up
+        - ip link set e2-1 up
+        - ip link set e2-4 up
+        - ip -6 route add 2001:db8:cafe:cafe:10::/80 via 2001:db8:cafe:cafe:25::1 dev e2-1
+        - ip -6 route add 2001:db8:cafe:cafe:20::/80 dev br2
+        - ip -6 route add 2001:db8:cafe:cafe:30::/80 via 2001:db8:cafe:cafe:25::1 dev e2-1
+        - ip -6 route add 2001:db8:cafe:cafe:40::/80 via 2001:db8:cafe:cafe:55::1 dev e2-4
+    r3:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - sysctl -w net.ipv6.conf.all.forwarding=1
+        - ip link add name br3 type bridge
+        - ip link set i3-4 master br3
+        - ip addr add 2001:db8:cafe:cafe:30::1/80 dev br3
+        - ip addr add 2001:db8:cafe:cafe:35::2/80 dev e3-1
+        - ip link set br3 up
+        - ip link set i3-4 up
+        - ip link set e3-1 up
+        - ip -6 route add 2001:db8:cafe:cafe:10::/80 via 2001:db8:cafe:cafe:35::1 dev e3-1
+        - ip -6 route add 2001:db8:cafe:cafe:20::/80 via 2001:db8:cafe:cafe:35::1 dev e3-1
+        - ip -6 route add 2001:db8:cafe:cafe:30::/80 dev br3
+        - ip -6 route add 2001:db8:cafe:cafe:40::/80 via 2001:db8:cafe:cafe:35::1 dev e3-1
+    r4:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - sysctl -w net.ipv6.conf.all.forwarding=1
+        - ip link add name br4 type bridge
+        - ip link set i4-5 master br4
+        - ip addr add 2001:db8:cafe:cafe:40::1/80 dev br4
+        - ip addr add 2001:db8:cafe:cafe:45::2/80 dev e4-1
+        - ip addr add 2001:db8:cafe:cafe:55::1/80 dev e4-2
+        - ip link set br4 up
+        - ip link set i4-5 up
+        - ip link set e4-1 up
+        - ip link set e4-2 up
+        - ip -6 route add 2001:db8:cafe:cafe:10::/80 via 2001:db8:cafe:cafe:45::1 dev e4-1
+        - ip -6 route add 2001:db8:cafe:cafe:20::/80 via 2001:db8:cafe:cafe:55::2 dev e4-2
+        - ip -6 route add 2001:db8:cafe:cafe:30::/80 via 2001:db8:cafe:cafe:45::1 dev e4-1
+        - ip -6 route add 2001:db8:cafe:cafe:40::/80 dev br4
+    pc1-1:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - ip addr add 2001:db8:cafe:cafe:10::2/80 dev e1
+        - ip link set e1 up
+        - ip -6 route add 2001:db8:cafe:cafe::/64 via 2001:db8:cafe:cafe:10::1
+    pc2-1:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - ip addr add 2001:db8:cafe:cafe:10::3/80 dev e1
+        - ip link set e1 up
+        - ip -6 route add 2001:db8:cafe:cafe::/64 via 2001:db8:cafe:cafe:10::1
+    pc3-2:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - ip addr add 2001:db8:cafe:cafe:20::2/80 dev e1
+        - ip link set e1 up
+        - ip -6 route add 2001:db8:cafe:cafe::/64 via 2001:db8:cafe:cafe:20::1
+    pc4-3:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - ip addr add 2001:db8:cafe:cafe:30::2/80 dev e1
+        - ip link set e1 up
+        - ip -6 route add 2001:db8:cafe:cafe::/64 via 2001:db8:cafe:cafe:30::1
+    pc5-4:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - ip addr add 2001:db8:cafe:cafe:40::2/80 dev e1
+        - ip link set e1 up
+        - ip -6 route add 2001:db8:cafe:cafe::/64 via 2001:db8:cafe:cafe:40::1
+
+  links:
+    - endpoints: ["r1:e1-2", "r2:e2-1"]
+    - endpoints: ["r1:e1-3", "r3:e3-1"]
+    - endpoints: ["r1:e1-4", "r4:e4-1"]
+    - endpoints: ["r2:e2-4", "r4:e4-2"]
+    - endpoints: ["r1:i1-1", "pc1-1:e1"]
+    - endpoints: ["r1:i1-2", "pc2-1:e1"]
+    - endpoints: ["r2:i2-3", "pc3-2:e1"]
+    - endpoints: ["r3:i3-4", "pc4-3:e1"]
+    - endpoints: ["r4:i4-5", "pc5-4:e1"]
+
+
+
+
