@@ -106,6 +106,6 @@ topology:
     - endpoints: ["h2:eth1", "bgp-evpn-net:port4"]
     - endpoints: ["h1:port1-1", "host1:eth1"]
     - endpoints: ["h1:port1-2", "host2:eth1"]
-    - endpoints: ["h1:port2-1", "host3:eth1"]
-    - endpoints: ["h2:port1-1", "host4:eth1"]
+    - endpoints: ["h1:port2-1", "host4:eth1"]
+    - endpoints: ["h2:port1-1", "host3:eth1"]
     - endpoints: ["h2:port2-1", "host5:eth1"]
