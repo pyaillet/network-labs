@@ -1,0 +1,41 @@
+#global:
+#  config:
+#    as: 65000
+#    router-id: 203.0.113.254
+#    local-address-list:
+#      - 203.0.113.254
+#peer-groups:
+#  - config:
+#      peer-group-name: rr-client
+#      peer-as: 65000
+#    afi-safis:
+#      - config:
+#          afi-safi-name: l2vpn-evpn
+#    route-reflector:
+#      config:
+#        route-reflector-client: true
+#        route-reflector-cluster-id: 203.0.113.254
+#dynamic-neighbors:
+#  - config:
+#      peer-group: rr-client
+#      prefix: 203.0.113.0/24
+#
+[global.config]
+  router-id = "203.0.113.254"
+  as = 65000
+
+[[peer-groups]]
+  [peer-groups.config]
+    peer-group-name = "rr-client"
+    peer-as = 65000
+  [[peer-groups.afi-safis]]
+    [peer-groups.afi-safis.config]
+      afi-safi-name = "l2vpn-evpn"
+  [peer-groups.route-reflector.config]
+    route-reflector-client = "true"
+    route-reflector-cluster-id = "203.0.113.254"
+
+[[dynamic-neighbors]]
+  [dynamic-neighbors.config]
+    prefix = "203.0.113.0/24"
+    peer-group = "rr-client"
