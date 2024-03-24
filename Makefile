@@ -19,7 +19,7 @@ ipv6-static-routes: deploy-ipv6-static-routes validate-ipv6-static-routes
 ipv4-ospf-routes: deploy-ipv4-ospf-routes validate-ipv4-ospf-routes
 
 .PHONY: bgp-evpn
-bgp-evpn: prepare-bgp-evpn deploy-bgp-evpn
+bgp-evpn: prepare-bgp-evpn deploy-bgp-evpn validate-bgp-evpn
 
 deploy-vxlan-multicast:
 	sudo containerlab deploy --topo ./vxlan-multicast/topology.yaml
@@ -52,6 +52,9 @@ validate-ipv6-static-routes:
 
 validate-ipv4-ospf-routes:
 	./ipv4-ospf-routes/validate.sh
+
+validate-bgp-evpn:
+	./bgp-evpn/validate.sh
 
 clean:
 	sudo containerlab destroy --topo vxlan-multicast/topology.yaml || true

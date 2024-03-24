@@ -39,10 +39,17 @@ topology:
         - ip link set vxlan200 master br200
         - ip link set up dev br200
         - ip link set up dev vxlan200
+        - ip link add vxlan300 type vxlan id 300 dstport 4789 local 203.0.113.2 nolearning
+        - ip link add name br300 type bridge
+        - ip link set vxlan300 master br300
+        - ip link set up dev br300
+        - ip link set up dev vxlan300
         - ip addr add 203.0.113.2/24 dev eth1
         - ip link set port1-1 master br100
         - ip link set port1-2 master br100
         - ip link set port2-1 master br200
+        - ip link set port3-1 master br300
+        - ip link set port3-2 master br300
 
     h2:
       kind: linux
@@ -62,9 +69,16 @@ topology:
         - ip link set vxlan200 master br200
         - ip link set up dev br200
         - ip link set up dev vxlan200
+        - ip link add vxlan300 type vxlan id 300 dstport 4789 local 203.0.113.3 nolearning
+        - ip link add name br300 type bridge
+        - ip link set vxlan300 master br300
+        - ip link set up dev br300
+        - ip link set up dev vxlan300
         - ip addr add 203.0.113.3/24 dev eth1
         - ip link set port1-1 master br100
         - ip link set port2-1 master br200
+        - ip link set port3-1 master br300
+        - ip link set port3-2 master br300
 
     host1:
       kind: linux
@@ -96,6 +110,22 @@ topology:
       exec:
         - ip a a 192.168.1.3/24 dev eth1
 
+    host6:
+      kind: linux
+      image: nicolaka/netshoot
+
+    host7:
+      kind: linux
+      image: nicolaka/netshoot
+
+    host8:
+      kind: linux
+      image: nicolaka/netshoot
+  
+    host9:
+      kind: linux
+      image: nicolaka/netshoot
+  
     bgp-evpn-net:
       kind: bridge
 
@@ -107,5 +137,9 @@ topology:
     - endpoints: ["h1:port1-1", "host1:eth1"]
     - endpoints: ["h1:port1-2", "host2:eth1"]
     - endpoints: ["h1:port2-1", "host4:eth1"]
+    - endpoints: ["h1:port3-1", "host6:eth1"]
+    - endpoints: ["h1:port3-2", "host7:eth1"]
     - endpoints: ["h2:port1-1", "host3:eth1"]
     - endpoints: ["h2:port2-1", "host5:eth1"]
+    - endpoints: ["h2:port3-1", "host8:eth1"]
+    - endpoints: ["h2:port3-2", "host9:eth1"]
