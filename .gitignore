@@ -3,5 +3,6 @@ clab-vxlan-static-vtep/
 clab-vxlan-multicast/
 clab-ipv6-static-routes/
 clab-ipv4-ospf-routes/
+clab-vrf/
 
 *.bak

@@ -5,6 +5,7 @@ default:
 	@echo " - ipv6-static-routes"
 	@echo " - ipv4-ospf-routes"
 	@echo " - bgp-evpn"
+	@echo " - vrf"
 
 .PHONY: vxlan-multicast
 vxlan-multicast: deploy-vxlan-multicast validate-vxlan-multicast
@@ -21,6 +22,9 @@ ipv4-ospf-routes: deploy-ipv4-ospf-routes validate-ipv4-ospf-routes
 .PHONY: bgp-evpn
 bgp-evpn: prepare-bgp-evpn deploy-bgp-evpn validate-bgp-evpn
 
+.PHONY: vrf
+vrf: prepare-vrf deploy-vrf validate-vrf
+
 deploy-vxlan-multicast:
 	sudo containerlab deploy --topo ./vxlan-multicast/topology.yaml
 
@@ -36,10 +40,16 @@ deploy-ipv4-ospf-routes:
 deploy-bgp-evpn:
 	sudo containerlab deploy --topo ./bgp-evpn/topology.yaml
 
+deploy-vrf:
+	sudo containerlab deploy --topo ./vrf/topology.yaml
+
 prepare-bgp-evpn:
 	docker image build ./bgp-evpn/ -t gobgp:local
 	sudo ip link add name bgp-evpn-net type bridge
 	sudo ip link set bgp-evpn-net up 
+
+prepare-vrf:
+	docker image build ./vrf/ -t nginx:local
 
 validate-vxlan-multicast:
 	./vxlan-multicast/validate.sh
@@ -56,13 +66,16 @@ validate-ipv4-ospf-routes:
 validate-bgp-evpn:
 	./bgp-evpn/validate.sh
 
+validate-vrf:
+	./vrf/validate.sh
+
 clean:
 	sudo containerlab destroy --topo vxlan-multicast/topology.yaml || true
 	sudo containerlab destroy --topo vxlan-static-vtep/topology.yaml || true
 	sudo containerlab destroy --topo ipv6-static-routes/topology.yaml || true
 	sudo containerlab destroy --topo ipv4-ospf-routes/topology.yaml || true
 	sudo containerlab destroy --topo bgp-evpn/topology.yaml || true
-	sudo ip link del bgp-evpn-net || true
+	sudo containerlab destroy --topo vrf/topology.yaml || true
 
 mrproper:
 	sudo rm -Rf ./clab-vxlan-multicast
@@ -70,3 +83,5 @@ mrproper:
 	sudo rm -Rf ./clab-ipv6-static-routes
 	sudo rm -Rf ./clab-ipv4-ospf-routes
 	sudo rm -Rf ./clab-bgp-evpn
+	sudo rm -Rf ./clab-vrf
+

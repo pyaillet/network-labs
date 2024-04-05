@@ -1,0 +1,38 @@
+name: vrf
+
+topology:
+  nodes:
+    r1:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - ip link add vrf-1 type vrf table 1
+        - ip link set dev vrf-1 up
+        - ip link set dev ens6 master vrf-1
+        - ip addr add 192.168.127.1/24 dev ens6
+        - ip link add vrf-2 type vrf table 2
+        - ip link set dev vrf-2 up
+        - ip link set dev ens7 master vrf-2
+        - ip addr add 192.168.127.1/24 dev ens7
+
+    red1:
+      kind: linux
+      image: nginx:local
+      exec:
+        - ip addr add 192.168.127.254/24 dev eth1
+        - ip addr add 192.168.127.101/24 dev eth1
+      binds:
+        - ./red/index.html:/usr/share/nginx/html/index.html
+
+    blue1:
+      kind: linux
+      image: nginx:local
+      exec:
+        - ip addr add 192.168.127.254/24 dev eth1
+        - ip addr add 192.168.127.20/24 dev eth1
+      binds:
+        - ./blue/index.html:/usr/share/nginx/html/index.html
+
+  links:
+    - endpoints: ["r1:ens6", "red1:eth1"]
+    - endpoints: ["r1:ens7", "blue1:eth1"]
