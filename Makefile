@@ -5,6 +5,7 @@ default:
 	@echo " - ipv6-static-routes"
 	@echo " - ipv4-ospf-routes"
 	@echo " - bgp-evpn"
+	@echo " - bgp-evpn-l3"
 	@echo " - vrf"
 
 .PHONY: vxlan-multicast
@@ -21,6 +22,9 @@ ipv4-ospf-routes: deploy-ipv4-ospf-routes validate-ipv4-ospf-routes
 
 .PHONY: bgp-evpn
 bgp-evpn: prepare-bgp-evpn deploy-bgp-evpn validate-bgp-evpn
+
+.PHONY: bgp-evpn-l3
+bgp-evpn-l3: deploy-bgp-evpn-l3 validate-bgp-evpn-l3
 
 .PHONY: vrf
 vrf: prepare-vrf deploy-vrf validate-vrf
@@ -40,13 +44,16 @@ deploy-ipv4-ospf-routes:
 deploy-bgp-evpn:
 	sudo containerlab deploy --topo ./bgp-evpn/topology.yaml
 
+deploy-bgp-evpn-l3:
+	sudo containerlab deploy --topo ./bgp-evpn-l3/topology.yaml
+
 deploy-vrf:
 	sudo containerlab deploy --topo ./vrf/topology.yaml
 
 prepare-bgp-evpn:
 	docker image build ./bgp-evpn/ -t gobgp:local
 	sudo ip link add name bgp-evpn-net type bridge
-	sudo ip link set bgp-evpn-net up 
+	sudo ip link set bgp-evpn-net up
 
 prepare-vrf:
 	docker image build ./vrf/ -t nginx:local
@@ -66,6 +73,9 @@ validate-ipv4-ospf-routes:
 validate-bgp-evpn:
 	./bgp-evpn/validate.sh
 
+validate-bgp-evpn-l3:
+	./bgp-evpn-l3/validate.sh
+
 validate-vrf:
 	./vrf/validate.sh
 
@@ -75,6 +85,7 @@ clean:
 	sudo containerlab destroy --topo ipv6-static-routes/topology.yaml || true
 	sudo containerlab destroy --topo ipv4-ospf-routes/topology.yaml || true
 	sudo containerlab destroy --topo bgp-evpn/topology.yaml || true
+	sudo containerlab destroy --topo bgp-evpn-l3/topology.yaml || true
 	sudo containerlab destroy --topo vrf/topology.yaml || true
 
 mrproper:
@@ -83,5 +94,6 @@ mrproper:
 	sudo rm -Rf ./clab-ipv6-static-routes
 	sudo rm -Rf ./clab-ipv4-ospf-routes
 	sudo rm -Rf ./clab-bgp-evpn
+	sudo rm -Rf ./clab-bgp-evpn-l3
 	sudo rm -Rf ./clab-vrf
 
