@@ -1,0 +1,96 @@
+# Inspired by the setup described here:
+# https://listed.to/@techtrips/15700/l3vpn-with-frr-and-evpn-vxlan-on-linux
+name: bgp-evpn-l3
+
+topology:
+  nodes:
+    core1:
+      kind: linux
+      image: quay.io/frrouting/frr:8.5.4
+      binds:
+        - core1/daemons:/etc/frr/daemons
+        - core1/frr.conf:/etc/frr/frr.conf
+      exec:
+        - echo "core1"
+        - ip addr add 192.18.3.1/24 dev ens192
+        - ip addr add 192.18.4.1/24 dev ens224
+        - ip route add 1.1.1.1/32 via 192.18.3.2
+        - ip route add 2.2.2.2/32 via 192.18.4.2
+
+    pe1:
+      kind: linux
+      image: quay.io/frrouting/frr:8.5.4
+      binds:
+        - pe1/daemons:/etc/frr/daemons
+        - pe1/frr.conf:/etc/frr/frr.conf
+      exec:
+        - echo "pe1"
+        - ip addr add 192.18.3.2/24 dev ens224
+        - ip addr add 1.1.1.1/32 dev lo
+        - ip route add 2.2.2.2/32 via 192.18.3.1
+        - ip link add name red type vrf table 1001
+        - ip addr add 127.0.0.1/8 dev red
+        - ip link add name vxlan1001 type vxlan id 1001 local 1.1.1.1 dev lo dstport 4789
+        - ip link add name br1001 type bridge
+        - ip link set br1001 master red
+        - ip link set vxlan1001 master br1001
+        - ip link add name lo1001 type dummy
+        - ip link set lo1001 master red
+        - ip addr add 1.0.0.1/32 dev lo1001
+        - ip link set red up
+        - ip link set vxlan1001 up
+        - ip link set br1001 up
+        - ip link set lo1001 up
+        - ip link add name blue type vrf table 1002
+        - ip link add name vxlan1002 type vxlan id 1002 local 1.1.1.1 dev lo dstport 4789
+        - ip link add name br1002 type bridge
+        - ip link set br1002 master blue
+        - ip link set vxlan1002 master br1002
+        - ip link add name lo1002 type dummy
+        - ip link set lo1002 master blue
+        - ip addr add 2.0.0.1/32 dev lo1002
+        - ip link set blue up
+        - ip link set vxlan1002 up
+        - ip link set br1002 up
+        - ip link set lo1002 up
+
+    pe2:
+      kind: linux
+      image: quay.io/frrouting/frr:8.5.4
+      binds:
+        - pe2/daemons:/etc/frr/daemons
+        - pe2/frr.conf:/etc/frr/frr.conf
+      exec:
+        - echo "pe2"
+        - ip addr add 192.18.4.2/24 dev ens224
+        - ip addr add 2.2.2.2/32 dev lo
+        - ip route add 1.1.1.1/32 via 192.18.4.1
+        - ip link add name red type vrf table 1001
+        - ip addr add 127.0.0.1/8 dev red
+        - ip link add name vxlan1001 type vxlan id 1001 local 2.2.2.2 dev lo dstport 4789
+        - ip link add name br1001 type bridge
+        - ip link set br1001 master red
+        - ip link set vxlan1001 master br1001
+        - ip link add name lo1001 type dummy
+        - ip link set lo1001 master red
+        - ip addr add 1.0.0.2/32 dev lo1001
+        - ip link set red up
+        - ip link set vxlan1001 up
+        - ip link set br1001 up
+        - ip link set lo1001 up
+        - ip link add name blue type vrf table 1002
+        - ip link add name vxlan1002 type vxlan id 1002 local 2.2.2.2 dev lo dstport 4789
+        - ip link add name br1002 type bridge
+        - ip link set br1002 master blue
+        - ip link set vxlan1002 master br1002
+        - ip link add name lo1002 type dummy
+        - ip link set lo1002 master blue
+        - ip addr add 2.0.0.2/32 dev lo1002
+        - ip link set blue up
+        - ip link set vxlan1002 up
+        - ip link set br1002 up
+        - ip link set lo1002 up
+
+  links:
+    - endpoints: ["core1:ens192", "pe1:ens224"]
+    - endpoints: ["core1:ens224", "pe2:ens224"]
