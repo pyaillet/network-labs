@@ -1,6 +1,6 @@
 # Inspired by the setup described here:
 # https://listed.to/@techtrips/15700/l3vpn-with-frr-and-evpn-vxlan-on-linux
-name: bgp-evpn-l3
+name: bgp-evpn-l3vpn
 
 topology:
   nodes:

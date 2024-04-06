@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-pe1="docker container exec clab-bgp-evpn-l3-pe1"
-pe2="docker container exec clab-bgp-evpn-l3-pe2"
+pe1="docker container exec clab-bgp-evpn-l3vpn-pe1"
+pe2="docker container exec clab-bgp-evpn-l3vpn-pe2"
 
 echo "Show bgp session on PE1"
 $pe1 vtysh -c 'show bgp l2vpn evpn summary'
