@@ -1,0 +1,32 @@
+{
+    "name": "network-labs",
+    "build": {
+      "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+      "vscode": {
+        "settings": {
+      "editor.fontFamily": "FiraCode Nerd Font Mono",
+      "editor.fontSize": 16,
+      "editor.formatOnPaste": true,
+      "editor.formatOnSave": true,
+      "editor.formatOnSaveMode": "modifications",
+      "editor.formatOnType": true,
+      "terminal.integrated.fontSize": 16,
+      "terminal.integrated.fontFamily": "FiraCode Nerd Font Mono"
+    },
+    "extensions": [
+      "mutantdino.resourcemonitor",
+      "yzhang.markdown-all-in-one",
+      "ms-azuretools.vscode-docker"
+    ],
+}
+    },
+    "forwardPorts": [
+      9012,
+      9333,
+      8000
+    ],
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/debian/network-labs,type=bind,consistency=cached",
+    "workspaceFolder": "/home/debian/network-labs"
+  }
