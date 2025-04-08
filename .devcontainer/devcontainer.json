@@ -21,12 +21,4 @@
       "ms-azuretools.vscode-docker"
     ],
 }
-    },
-    "forwardPorts": [
-      9012,
-      9333,
-      8000
-    ],
-    "workspaceMount": "source=${localWorkspaceFolder},target=/home/debian/network-labs,type=bind,consistency=cached",
-    "workspaceFolder": "/home/debian/network-labs"
   }
