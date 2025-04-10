@@ -4,6 +4,9 @@ VERSION := noble
 GENERIC_VM_PATH := .tools/vm
 VM_PATH := $(GENERIC_VM_PATH)/$(DISTRIBUTION)
 
+$(VM_PATH):
+	mkdir -p $(VM_PATH)
+
 vm:
 	@echo "🖥️ Choose an option:"
 	@echo " - vm-launch"
@@ -16,23 +19,23 @@ vm-clean:
 	@echo "🔥 Cleaning files"
 	@rm $(VM_PATH)/*
 
-$(GENERIC_VM_PATH)/ubuntu/initrd.img:
+$(GENERIC_VM_PATH)/ubuntu/initrd.img: $(GENERIC_VM_PATH)/ubuntu
 	@echo "📦 Downloading ubuntu initrd.img"
 	@curl --silent -LO https://cloud-images.ubuntu.com/$(VERSION)/current/unpacked/$(VERSION)-server-cloudimg-$(ARCH)-initrd-generic
 	@mv $(VERSION)-server-cloudimg-$(ARCH)-initrd-generic ./$(VM_PATH)/initrd.img
 
-$(GENERIC_VM_PATH)/ubuntu/vmlinuz:
+$(GENERIC_VM_PATH)/ubuntu/vmlinuz: $(GENERIC_VM_PATH)/ubuntu
 	@echo "📦 Downloading ubuntu vmlinuz"
 	@curl --silent -LO https://cloud-images.ubuntu.com/$(VERSION)/current/unpacked/$(VERSION)-server-cloudimg-$(ARCH)-vmlinuz-generic
 	@mv $(VERSION)-server-cloudimg-$(ARCH)-vmlinuz-generic ./$(VM_PATH)/vmlinuz
 
-$(GENERIC_VM_PATH)/ubuntu/root-disk.img:
+$(GENERIC_VM_PATH)/ubuntu/root-disk.img: $(GENERIC_VM_PATH)/ubuntu
 	@echo "📦 Downloading ubuntu disk.img"
 	@curl --silent -LO https://cloud-images.ubuntu.com/$(VERSION)/current/$(VERSION)-server-cloudimg-$(ARCH).img
 	@mv $(VERSION)-server-cloudimg-$(ARCH).img ./$(VM_PATH)/root-disk.img
 	@qemu-img resize -f qcow2 ./$(VM_PATH)/root-disk.img +10G
 
-$(GENERIC_VM_PATH)/debian/root-disk.img:
+$(GENERIC_VM_PATH)/debian/root-disk.img: $(GENERIC_VM_PATH)/debian
 	@echo "📦 Downloading debian disk.img"
 	@curl -LO https://cloud.debian.org/images/cloud/$(VERSION)/daily/latest/$(DISTRIBUTION)-genericcloud-$(ARCH)-daily.qcow2
 	@mv $(DISTRIBUTION)-genericcloud-$(ARCH)-daily.qcow2 ./$(VM_PATH)/root-disk.img
@@ -57,16 +60,11 @@ $(VM_PATH)/my-seed.img: .tools/cloudinit/my-meta-data.yaml .tools/cloudinit/user
 seed: $(VM_PATH)/my-seed.img
 	@echo "✅ Created cloudinit seed"
 
-.PHONY: pre-requisites
-pre-requisites:
-	@echo "🏗️ Installing pre-requisites"
-	@sudo bash -c "apt-get -qq update && apt-get -q install -y cloud-image-utils qemu-system qemu-utils"
-
 .PHONY: vm-prepare
 vm-prepare: download-files vm-ssh-keys seed
 	@echo "✅ VM prepared"
 
-$(VM_PATH)/qemu-ubuntu.pid:
+$(VM_PATH)/qemu.pid:
 	@echo "🚀 Launching VM"
 	@sudo qemu-system-x86_64 \
 	  -cpu host \

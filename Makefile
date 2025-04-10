@@ -99,6 +99,21 @@ validate-vrf:
 
 .PHONY: pre-requisites
 pre-requisites:
+	@echo "🏗️ Installing pre-requisites"
+	@sudo bash -c "apt-get -qq update && apt-get -q install -y cloud-image-utils qemu-system qemu-utils"
+
+.PHONY: install-lima
+install-lima: $(HOME)/.local/bin/limactl
+	@echo "✅ Installed lima-vm"
+
+$(HOME)/.local/bin/limactl:
+	@echo "🛠️ Install lima-vm" && \
+	export TMP_DIR=$(shell mktemp) && \
+	cd $(TMP_DIR) && \
+	git clone https://github.com/lima-vm/lima && \
+	cd lima && \
+	make && \
+	make PREFIX=$(HOME)/.local/bin install
 
 .PHONY: clean
 clean:
