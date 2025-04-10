@@ -13,4 +13,7 @@ sudo qemu-system-x86_64 \
   -append "root=/dev/vda1 console=ttyS0" \
   -netdev id=net00,type=user \
   -device virtio-net-pci,netdev=net00 \
-  -drive if=virtio,format=qcow2,file=${VERSION}-server-cloudimg-${ARCH}.img
+  -drive if=virtio,format=qcow2,file=${VERSION}-server-cloudimg-${ARCH}.img \
+  -drive if=virtio,format=raw,file=my-seed.img \
+  -fsdev local,id=wkspace,path=/workspaces,security_model=mapped,multidevs=remap \
+  -device virtio-9p-pci,fsdev=wkspace,mount_tag=wkspace
