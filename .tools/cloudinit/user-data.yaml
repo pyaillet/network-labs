@@ -1,0 +1,19 @@
+#cloud-config
+password: ubuntu
+chpasswd: { expire: False }
+ssh_pwauth: True
+resize_rootfs: True
+mounts:
+- ["wkspace", "/workspaces", "9p", "trans=virtio,version=9p2000.L,posixacl,msize=104857600"]
+package_update: True
+packages:
+- make
+- docker.io
+- bridge-utils
+- openvswitch-switch
+- update-motd
+runcmd:
+- bash -c "/workspaces/network-labs/.tools/pre-requisites/setup.sh"
+- usermod -aG docker ubuntu
+- echo "*** 👋 Welcome to 📡 network-labs 🥼 ***\n\nTo check which labs are available just type `make`\n" > /etc/motd
+- update-motd
