@@ -7,3 +7,5 @@ clab-ipv4-ospf-routes/
 clab-vrf/
 
 *.bak
+
+.tools/vm/
