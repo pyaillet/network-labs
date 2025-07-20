@@ -1,0 +1,57 @@
+name: ovs-vlan
+
+topology:
+  nodes:
+    br0:
+      kind: ovs-bridge
+    pc1-1:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - ip a a 192.168.5.2/24 dev e0
+    pc1-2:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - ip a a 192.168.5.3/24 dev e0
+    pc2-1:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - ip a a 192.168.5.4/24 dev e0
+    pc2-2:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - ip a a 192.168.5.5/24 dev e0
+    br1:
+      kind: ovs-bridge
+    pc1-3:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - ip a a 192.168.5.6/24 dev e0
+    pc1-4:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - ip a a 192.168.5.7/24 dev e0
+    pc2-3:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - ip a a 192.168.5.8/24 dev e0
+    pc2-4:
+      kind: linux
+      image: nicolaka/netshoot
+      exec:
+        - ip a a 192.168.5.9/24 dev e0
+  links:
+    - endpoints: ["br0:ovsp0-1", "pc1-1:e0"]
+    - endpoints: ["br0:ovsp0-2", "pc1-2:e0"]
+    - endpoints: ["br0:ovsp0-3", "pc2-1:e0"]
+    - endpoints: ["br0:ovsp0-4", "pc2-2:e0"]
+    - endpoints: ["br1:ovsp1-1", "pc1-3:e0"]
+    - endpoints: ["br1:ovsp1-2", "pc1-4:e0"]
+    - endpoints: ["br1:ovsp1-3", "pc2-3:e0"]
+    - endpoints: ["br1:ovsp1-4", "pc2-4:e0"]
